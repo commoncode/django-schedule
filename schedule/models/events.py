@@ -9,6 +9,7 @@ from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
 import datetime
 from dateutil import rrule
+from dateutil.tz import gettz
 from schedule.models.rules import Rule
 from schedule.models.calendars import Calendar
 from schedule.utils import OccurrenceReplacer
@@ -26,7 +27,10 @@ class Event(models.Model):
     start = models.DateTimeField(_("start"))
     end = models.DateTimeField(_("end"),help_text=_("The end time must be later than the start time."))
     title = models.CharField(_("title"), max_length = 255)
-    description = models.TextField(_("description"), null = True, blank = True)
+    brief_description = models.TextField(_("brief description"), null = True, blank = True)
+    detailed_description = models.TextField(_("detailed_description"), null = True, blank = True)
+    contact_details = models.TextField(_("contact details"), null = True, blank = True)
+    location = models.TextField(_("location"), null = True, blank = True)
     creator = models.ForeignKey(User, null = True, verbose_name=_("creator"))
     created_on = models.DateTimeField(_("created on"), default = datetime.datetime.now)
     rule = models.ForeignKey(Rule, null = True, blank = True, verbose_name=_("rule"), help_text=_("Select '----' for a one time only event."))
@@ -37,7 +41,7 @@ class Event(models.Model):
     class Meta:
         verbose_name = _('event')
         verbose_name_plural = _('events')
-        app_label = 'schedule'
+        app_label = 'events'
 
     def __unicode__(self):
         date_format = u'l, %s' % ugettext("DATE_FORMAT")
@@ -356,14 +360,14 @@ class Occurrence(models.Model):
     class Meta:
         verbose_name = _("occurrence")
         verbose_name_plural = _("occurrences")
-        app_label = 'schedule'
+        app_label = 'events'
 
     def __init__(self, *args, **kwargs):
         super(Occurrence, self).__init__(*args, **kwargs)
         if self.title is None:
             self.title = self.event.title
         if self.description is None:
-            self.description = self.event.description
+            self.description = self.event.detailed_description
 
 
     def moved(self):
