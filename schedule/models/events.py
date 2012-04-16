@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date
+from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext, ugettext_lazy as _
 import datetime
 from dateutil import rrule
@@ -13,6 +14,7 @@ from dateutil.tz import gettz
 from schedule.models.rules import Rule
 from schedule.models.calendars import Calendar
 from schedule.utils import OccurrenceReplacer
+from django.contrib.sites.models import Site
 
 class EventManager(models.Manager):
 
@@ -430,6 +432,31 @@ class Occurrence(models.Model):
             'second': self.start.second,
         })
 
+    def ics_url(self):
+        """
+        Needs to be fully-qualified (for sending to calendar apps). Your app needs to define
+        an 'ics_for_occurrence' url, and properties for populating an ics for each event
+        (see OccurrenceModel.as_icalendar)
+        """
+        current_site = Site.objects.get_current()
+        return 'http://' + current_site.domain + reverse("event_ical", args=[
+                self.event.pk,
+                self.start.year,
+                self.start.month,
+                self.start.day,
+                self.start.hour,
+                self.start.minute,
+                ])
+
+    def webcal_url(self):
+        return self.ics_url()\
+            .replace("http://", "webcal://")\
+            .replace("https://", "webcal://")
+
+    def gcal_url(self):
+        return  "http://www.google.com/calendar/render?cid=" + \
+                urlencode(self.ics_url())
+
     def __unicode__(self):
         return ugettext("%(start)s to %(end)s") % {
             'start': self.start,
@@ -443,4 +470,7 @@ class Occurrence(models.Model):
         return rank
 
     def __eq__(self, other):
-        return self.event == other.event and self.original_start == other.original_start and self.original_end == other.original_end
+        return (self.event == other.event
+            and self.original_start == other.original_start
+            and self.original_end == other.original_end
+            )
