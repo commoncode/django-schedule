@@ -302,6 +302,16 @@ class Day(Period):
             'end': date(self.end, date_format),
         }
 
+    def is_past(self):
+        date = datetime.datetime.now()
+        start = datetime.datetime.combine(date.date(), datetime.time.min)
+        return self.start < start
+
+    def is_today(self):
+        date = datetime.datetime.now()
+        start = datetime.datetime.combine(date.date(), datetime.time.min)
+        return self.start == start
+
     def prev_day(self):
         return Day(self.events, self.start - datetime.timedelta(days=1))
     prev = prev_day
