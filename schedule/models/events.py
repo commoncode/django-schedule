@@ -32,6 +32,7 @@ class Event(models.Model):
     brief_description = models.TextField(_("brief description"), null = True, blank = True)
     detailed_description = models.TextField(_("detailed_description"), null = True, blank = True)
     contact_details = models.TextField(_("contact details"), null = True, blank = True)
+    more_info = models.URLField(_("more info"), null = True, blank = True)
     location = models.TextField(_("location"), null = True, blank = True)
     creator = models.ForeignKey(User, null = True, verbose_name=_("creator"))
     created_on = models.DateTimeField(_("created on"), default = datetime.datetime.now)
