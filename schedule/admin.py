@@ -9,10 +9,10 @@ admin.site.register(Calendar, CalendarAdminOptions)
 
 
 class EventFormAdmin(forms.ModelForm):
-    brief_description = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}))
-    detailed_description = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}))
-    contact_details = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}))
-    location = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}))
+    brief_description = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}), required=False)
+    detailed_description = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}), required=False)
+    contact_details = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}), required=False)
+    location = forms.CharField(widget=forms.Textarea(attrs={'class':'rich-text'}), required=False)
     class Meta:
         model = Event
 class EventAdmin(admin.ModelAdmin):
