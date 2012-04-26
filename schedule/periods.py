@@ -3,6 +3,7 @@ from django.db.models.query import QuerySet
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.dates import WEEKDAYS, WEEKDAYS_ABBR
+from django.core.urlresolvers import reverse
 from schedule.conf.settings import FIRST_DAY_OF_WEEK, SHOW_CANCELLED_OCCURRENCES
 from schedule.models import Occurrence
 from schedule.utils import OccurrenceReplacer
@@ -220,6 +221,19 @@ class Month(Period):
 
     def year(self):
         return self.start.strftime('%Y')
+
+    def calendar_url(self):
+        prev_month = self.prev_month()
+        return reverse('event_calendar', kwargs={
+            'year': prev_month.start.year,
+            'month': prev_month.start.month,
+            })
+
+    def list_url(self):
+        return reverse('event_list', kwargs={
+            'year': self.start.year,
+            'month': self.start.month,
+            })
 
 
 class Week(Period):

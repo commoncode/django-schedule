@@ -10,7 +10,6 @@ from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext, ugettext_lazy as _
 import datetime
 from dateutil import rrule
-from dateutil.tz import gettz
 from schedule.models.rules import Rule
 from schedule.models.calendars import Calendar
 from schedule.utils import OccurrenceReplacer
@@ -32,7 +31,8 @@ class Event(models.Model):
     brief_description = models.TextField(_("brief description"), null = True, blank = True)
     detailed_description = models.TextField(_("detailed_description"), null = True, blank = True)
     contact_details = models.TextField(_("contact details"), null = True, blank = True)
-    more_info = models.URLField(_("more info"), null = True, blank = True)
+    more_info = models.TextField(_("more info"), null=True, blank=True)
+    featured_event = models.BooleanField(_("feature event"))
     location = models.TextField(_("location"), null = True, blank = True)
     creator = models.ForeignKey(User, null = True, verbose_name=_("creator"))
     created_on = models.DateTimeField(_("created on"), default = datetime.datetime.now)
@@ -392,17 +392,19 @@ class Occurrence(models.Model):
         self.save()
 
     def get_absolute_url(self):
-        if self.pk is not None:
-            return reverse('occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
-        return reverse('occurrence_by_date', kwargs={
+        return reverse('event_details', kwargs={
             'event_id': self.event.id,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,
             'hour': self.start.hour,
             'minute': self.start.minute,
-            'second': self.start.second,
+        })
+
+    def calendar_url(self):
+        return reverse('event_calendar', kwargs={
+            'year': self.start.year,
+            'month': self.start.month,
         })
 
     def get_cancel_url(self):
