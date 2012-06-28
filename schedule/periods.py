@@ -172,7 +172,7 @@ class Month(Period):
 
     def get_weeks(self):
         return self.get_periods(Week)
-        date = self.star
+        date = self.start
 
     def get_days(self):
         return self.get_periods(Day)
@@ -223,10 +223,9 @@ class Month(Period):
         return self.start.strftime('%Y')
 
     def calendar_url(self):
-        prev_month = self.prev_month()
         return reverse('event_calendar', kwargs={
-            'year': prev_month.start.year,
-            'month': prev_month.start.month,
+            'year': self.start.year,
+            'month': self.start.month,
             })
 
     def list_url(self):
